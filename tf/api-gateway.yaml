@@ -1,0 +1,135 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Test API
+paths:
+  /subscribe:
+    x-yc-apigateway-cors:
+      origin: true
+      methods: [GET,POST]
+    post:
+      operationId: subscribe
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: ${api_function}
+        service_account_id: ${invoker_sa_id}
+        payload_format_version: "1.0"
+      x-yc-apigateway-validator:
+        validateRequestBody: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ["email", "captchaToken"]
+              properties:
+                email:
+                  type: string
+                captchaToken:
+                  type: string
+              additionalProperties: false
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: ["email", "captchaToken"]
+              properties:
+                email:
+                  type: string
+                captchaToken:
+                  type: string
+              additionalProperties: false
+      # Response body schema
+      # Docs: https://spec.openapis.org/oas/latest.html#responses-object
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: Success
+
+  /unsubscribe/{subscription_id}:
+    post:
+      operationId: unsubscribePost
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: ${api_function}
+        service_account_id: ${invoker_sa_id}
+        payload_format_version: "1.0"
+      x-yc-apigateway-validator:
+        validateRequestBody: true
+      parameters:
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+
+      # Response body schema
+      # Docs: https://spec.openapis.org/oas/latest.html#responses-object
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: Success
+    get:
+      operationId: unsubscribe
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: ${api_function}
+        service_account_id: ${invoker_sa_id}
+        payload_format_version: "1.0"
+      parameters:
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+
+      # Response body schema
+      # Docs: https://spec.openapis.org/oas/latest.html#responses-object
+      responses:
+        '200':
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Success
+  /verify/{subscription_id}:
+    get:
+      operationId: verify
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: ${api_function}
+        service_account_id: ${invoker_sa_id}
+        payload_format_version: "1.0"
+      x-yc-apigateway-validator:
+        validateRequestBody: true
+      parameters:
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+
+      # Response body schema
+      # Docs: https://spec.openapis.org/oas/latest.html#responses-object
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: Success
